@@ -57,6 +57,7 @@ public class RoboscanDAOImpl implements RoboscanDAO{
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+		System.out.println("dataset: "+proc);
 		return proc;
 	}
 
@@ -72,13 +73,18 @@ public class RoboscanDAOImpl implements RoboscanDAO{
 			
 			for(int i = 0; i < procedureData.size(); i++)
 			{
-				int j = i + 1; 
-				List<String> proc = procedureData.get(i);
+ 
+				List<String> procData = procedureData.get(i);
+				
+				String sectionName = procData.get(0);
+				String procedureName = procData.get(2);
+				String viewTypes = procData.get(4);
+				String graphTypes = procData.get(6);
 
-				if(sections.contains(proc.get(0)))
+				if(sections.contains(sectionName))
 				{
 
-				callableStatement = connection.prepareCall("{CALL COMAML."+proc.get(2)+"(?,?,?,?)}");
+				callableStatement = connection.prepareCall("{CALL COMAML."+procedureName+"(?,?,?,?)}");
 				callableStatement.setString(1, caseNo);
 				callableStatement.registerOutParameter(2, OracleTypes.CURSOR);
 				callableStatement.registerOutParameter(3, OracleTypes.CURSOR);
@@ -86,13 +92,16 @@ public class RoboscanDAOImpl implements RoboscanDAO{
 				
 				callableStatement.execute();
 				
-				Map<String, Object> dataTest = new LinkedHashMap<String, Object>();
+				Map<String, Object> roboData = new LinkedHashMap<String, Object>();
 				 
 				ResultSet resultSet1 = (ResultSet) callableStatement.getObject(2);
 				ResultSetMetaData section1MetaData = resultSet1.getMetaData();
 				Map<String, Object> roboscanSection1 = new LinkedHashMap<String, Object>();
 				List<String> headers = new Vector<String>();
 				List<List<String>> data = new Vector<List<String>>();
+				
+				
+				
 				for(int colIndex = 1; colIndex <= section1MetaData.getColumnCount(); colIndex++){
 					headers.add(section1MetaData.getColumnName(colIndex));
 				}
@@ -108,6 +117,7 @@ public class RoboscanDAOImpl implements RoboscanDAO{
 				roboscanSection1.put("DATA", data);
 				
 				resultSet1.close();
+	
 				
 				ResultSet resultSet2 = (ResultSet) callableStatement.getObject(3);
 				ResultSetMetaData section2MetaData = resultSet2.getMetaData();
@@ -118,8 +128,9 @@ public class RoboscanDAOImpl implements RoboscanDAO{
 						roboscanSection2.put(columnName, resultSet2.getString(columnName));
 					}
 				}
-				
+	
 				resultSet2.close();
+				
 				
 				ResultSet resultSet3 = (ResultSet) callableStatement.getObject(4);
 				ResultSetMetaData section3MetaData = resultSet3.getMetaData();
@@ -140,17 +151,20 @@ public class RoboscanDAOImpl implements RoboscanDAO{
 				}
 				roboscanSection3.put("ATTRIBUTE", attr);
 				roboscanSection3.put("VALUES", values);
-				roboscanSectionData.put("TYPES", proc.get(6));
+				roboscanSectionData.put("TYPES", graphTypes);
 				roboscanSectionData.put("Data", roboscanSection3);
 				
 				resultSet3.close();
 	
 				
-				dataTest.put("DataTable", roboscanSection1);
-				dataTest.put("Form", roboscanSection2);
-				dataTest.put("Graph", roboscanSectionData);
+				roboData.put("DataTable", roboscanSection1);
+				if(viewTypes.contains("FORM") == false){
+				roboData.put("Form", null);}
+				if(viewTypes.contains("FORM") == true){
+					roboData.put("Form", roboscanSection2);}
+				roboData.put("Graph", roboscanSectionData);
 				
-				allSection.put(proc.get(0), dataTest);
+				allSection.put(sectionName, roboData);
 			}
 
 			}
@@ -179,6 +193,50 @@ public class RoboscanDAOImpl implements RoboscanDAO{
 			e.printStackTrace();
 		}
 		return data;
+	}
+
+
+	@Override
+	public Map<String, Object> procedureDetails(String sections) {
+		Connection connection = connectionUtil.getConnection();
+		PreparedStatement preparedStatement = null;
+		Map<String, Object> data = new HashMap<String, Object>();
+		Map<String, Object> data1 = new HashMap<String, Object>();
+		String sectionData = sections;
+		String sectionData1 = sectionData.replace(",", "\',\'");
+		String sectionList = "\'"+sectionData1+"\'";
+		System.out.println("sectionList: "+sectionList);
+		ResultSet resultSet = null;
+		List<List<String>> proc = new LinkedList<List<String>>();
+		try {
+			preparedStatement = connection.prepareStatement("SELECT SECTIONNAME, DESCRIPTION, PROCNAME, "
+					+ "PRIMARYVIEWTYPE, VIEWTYPES, PRIMARYGRAPHTYPE, GRAPHTYPES, ICON "
+					+ "FROM COMAML.TB_ROBOSCANSECTIONMASTER "
+					+ "WHERE SECTIONNAME IN ("+sectionList+") ");
+			resultSet = preparedStatement.executeQuery();
+			while(resultSet.next())
+			{
+				List<String> procName = new LinkedList<String>();
+				procName.add(resultSet.getString("SECTIONNAME"));	
+				procName.add(resultSet.getString("DESCRIPTION"));
+				procName.add(resultSet.getString("PROCNAME"));	
+				procName.add(resultSet.getString("PRIMARYVIEWTYPE"));
+				procName.add(resultSet.getString("VIEWTYPES"));	
+				procName.add(resultSet.getString("PRIMARYGRAPHTYPE"));
+				procName.add(resultSet.getString("GRAPHTYPES"));	
+				procName.add(resultSet.getString("ICON"));
+			proc.add(procName);
+			data.put(resultSet.getString("SECTIONNAME"), procName);
+			}	
+			data1.put("list",proc);
+			data1.put("map", data);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		System.out.println("dataset1: "+proc);
+		System.out.println("dataset2: "+data1);
+		return data1;
 	}
 	
 

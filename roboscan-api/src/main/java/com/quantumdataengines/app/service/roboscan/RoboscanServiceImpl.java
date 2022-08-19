@@ -30,4 +30,9 @@ public class RoboscanServiceImpl implements RoboscanService {
 		return roboscanDao.sectionList(userrole);
 	}
 
+	@Override
+	public Map<String, Object> procedureDetails(String sections) {
+		return roboscanDao.procedureDetails(sections);
+	}
+
 }
