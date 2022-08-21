@@ -157,12 +157,40 @@ public class RoboscanDAOImpl implements RoboscanDAO{
 				resultSet3.close();
 	
 				
-				roboData.put("DataTable", roboscanSection1);
-				if(viewTypes.contains("FORM") == false){
-				roboData.put("Form", null);}
-				if(viewTypes.contains("FORM") == true){
-					roboData.put("Form", roboscanSection2);}
-				roboData.put("Graph", roboscanSectionData);
+				if(viewTypes.contains("TABLE") == false)
+				{
+					roboData.put("DataTable", null);
+				}
+				else
+				{
+					roboData.put("DataTable", roboscanSection1);
+				}
+				
+				
+				
+				
+				if(viewTypes.contains("FORM") == false)
+				{
+					roboData.put("Form", null);
+				}
+				else
+				{
+					roboData.put("Form", roboscanSection2);
+				}
+				
+				
+				if(viewTypes.contains("GRAPH") == false)
+				{
+					roboData.put("Graph", null);
+				}
+				else
+				{
+					roboData.put("Graph", roboscanSectionData);
+				}
+				
+				
+				
+				
 				
 				allSection.put(sectionName, roboData);
 			}

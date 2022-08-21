@@ -46,7 +46,7 @@ public class RoboscanController {
 		List<Object> listAllData = new ArrayList<Object>();
 		listAllData.add(allData);
 		
-		mainData.put("ProcedureData",procedureDataMap);
+		//mainData.put("ProcedureData",procedureDataMap);
 		mainData.put("RoboscanData",allData);
 
 		return mainData;
