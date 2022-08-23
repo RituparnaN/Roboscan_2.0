@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import com.quantumdataengines.app.util.ConnectionUtil;
@@ -23,6 +25,9 @@ import oracle.jdbc.OracleTypes;
 
 @Repository
 public class RoboscanDAOImpl implements RoboscanDAO{
+	
+	@Value("${second.datasource.username}")
+	private String secondSchema;
 	
 	@Autowired
 	private ConnectionUtil connectionUtil;
@@ -80,118 +85,58 @@ public class RoboscanDAOImpl implements RoboscanDAO{
 				String procedureName = procData.get(2);
 				String viewTypes = procData.get(4);
 				String graphTypes = procData.get(6);
+				String[] allGraphs = null;
+				
+				if(graphTypes != null){		
+					graphTypes = graphTypes.replace(" ", "");
+					allGraphs = graphTypes.split(",",0);
+				}
 
-				if(sections.contains(sectionName))
-				{
-
-				callableStatement = connection.prepareCall("{CALL COMAML."+procedureName+"(?,?,?,?)}");
+				if(sections.contains(sectionName)){
+					
+				callableStatement = connection.prepareCall("{CALL "+secondSchema+"."+procedureName+"(?,?,?,?)}");
 				callableStatement.setString(1, caseNo);
 				callableStatement.registerOutParameter(2, OracleTypes.CURSOR);
 				callableStatement.registerOutParameter(3, OracleTypes.CURSOR);
-				callableStatement.registerOutParameter(4, OracleTypes.CURSOR);
-				
+				callableStatement.registerOutParameter(4, OracleTypes.CURSOR);			
 				callableStatement.execute();
 				
 				Map<String, Object> roboData = new LinkedHashMap<String, Object>();
+				
 				 
 				ResultSet resultSet1 = (ResultSet) callableStatement.getObject(2);
-				ResultSetMetaData section1MetaData = resultSet1.getMetaData();
-				Map<String, Object> roboscanSection1 = new LinkedHashMap<String, Object>();
-				List<String> headers = new Vector<String>();
-				List<List<String>> data = new Vector<List<String>>();
-				
-				
-				
-				for(int colIndex = 1; colIndex <= section1MetaData.getColumnCount(); colIndex++){
-					headers.add(section1MetaData.getColumnName(colIndex));
-				}
-				while(resultSet1.next()){
-					List<String> record = new Vector<String>();
-					for(int colIndex = 1; colIndex <= section1MetaData.getColumnCount(); colIndex++){
-						String columnName = section1MetaData.getColumnName(colIndex);
-						record.add(resultSet1.getString(columnName));
-					}
-					data.add(record);
-				}
-				roboscanSection1.put("HEADER", headers);
-				roboscanSection1.put("DATA", data);
-				
+				Map<String, Object> tableData = tableResult(resultSet1);	
 				resultSet1.close();
 	
-				
 				ResultSet resultSet2 = (ResultSet) callableStatement.getObject(3);
-				ResultSetMetaData section2MetaData = resultSet2.getMetaData();
-				Map<String, String> roboscanSection2 = new LinkedHashMap<String, String>();
-				while(resultSet2.next()){
-					for(int colIndex = 1; colIndex <= section2MetaData.getColumnCount(); colIndex++){
-						String columnName = section2MetaData.getColumnName(colIndex);
-						roboscanSection2.put(columnName, resultSet2.getString(columnName));
-					}
-				}
-	
+				Map<String, String> formData = formResult(resultSet2);
 				resultSet2.close();
 				
 				
 				ResultSet resultSet3 = (ResultSet) callableStatement.getObject(4);
-				ResultSetMetaData section3MetaData = resultSet3.getMetaData();
+				Map<String, Object> graphData = graphResult(resultSet3);
 				Map<String, Object> roboscanSectionData = new LinkedHashMap<String, Object>();
-				Map<String, Object> roboscanSection3 = new LinkedHashMap<String, Object>();
-				List<String> attr = new Vector<String>();
-				List<List<String>> values = new Vector<List<String>>();
-				for(int colIndex = 1; colIndex <= section3MetaData.getColumnCount(); colIndex++){
-					attr.add(section3MetaData.getColumnName(colIndex));
-				}
-				while(resultSet3.next()){
-					List<String> record = new Vector<String>();
-					for(int colIndex = 1; colIndex <= section3MetaData.getColumnCount(); colIndex++){
-						String columnName = section3MetaData.getColumnName(colIndex);
-						record.add(resultSet3.getString(columnName));
-					}
-					values.add(record);
-				}
-				roboscanSection3.put("ATTRIBUTE", attr);
-				roboscanSection3.put("VALUES", values);
-				roboscanSectionData.put("TYPES", graphTypes);
-				roboscanSectionData.put("Data", roboscanSection3);
+				roboscanSectionData.put("TYPES", allGraphs);
+				roboscanSectionData.put("Data", graphData);
 				
 				resultSet3.close();
 	
 				
 				if(viewTypes.contains("TABLE") == false)
-				{
-					roboData.put("DataTable", null);
-				}
+				{roboData.put("DataTable", null);}
 				else
-				{
-					roboData.put("DataTable", roboscanSection1);
-				}
-				
-				
-				
-				
+				{roboData.put("DataTable", tableData);}
+
 				if(viewTypes.contains("FORM") == false)
-				{
-					roboData.put("Form", null);
-				}
+				{roboData.put("Form", null);}
 				else
-				{
-					roboData.put("Form", roboscanSection2);
-				}
-				
+				{roboData.put("Form", formData);}				
 				
 				if(viewTypes.contains("GRAPH") == false)
-				{
-					roboData.put("Graph", null);
-				}
+				{roboData.put("Graph", null);}
 				else
-				{
-					roboData.put("Graph", roboscanSectionData);
-				}
-				
-				
-				
-				
-				
+				{roboData.put("Graph", roboscanSectionData);}
+			
 				allSection.put(sectionName, roboData);
 			}
 
@@ -262,9 +207,65 @@ public class RoboscanDAOImpl implements RoboscanDAO{
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		System.out.println("dataset1: "+proc);
-		System.out.println("dataset2: "+data1);
 		return data1;
+	}
+	
+	private Map<String, Object> tableResult(ResultSet resultSet1) throws SQLException{
+		
+		ResultSetMetaData section1MetaData = resultSet1.getMetaData();
+		Map<String, Object> roboscanSection1 = new LinkedHashMap<String, Object>();
+		List<String> headers = new Vector<String>();
+		List<List<String>> data = new Vector<List<String>>();
+	
+		for(int colIndex = 1; colIndex <= section1MetaData.getColumnCount(); colIndex++){
+			headers.add(section1MetaData.getColumnName(colIndex));
+		}
+		while(resultSet1.next()){
+			List<String> record = new Vector<String>();
+			for(int colIndex = 1; colIndex <= section1MetaData.getColumnCount(); colIndex++){
+				String columnName = section1MetaData.getColumnName(colIndex);
+				record.add(resultSet1.getString(columnName));
+			}
+			data.add(record);
+		}
+		roboscanSection1.put("HEADER", headers);
+		roboscanSection1.put("DATA", data);
+		
+		return roboscanSection1;		
+	}
+	
+	private Map<String, String> formResult(ResultSet resultSet2) throws SQLException{
+		
+		ResultSetMetaData section2MetaData = resultSet2.getMetaData();
+		Map<String, String> roboscanSection2 = new LinkedHashMap<String, String>();
+		while(resultSet2.next()){
+			for(int colIndex = 1; colIndex <= section2MetaData.getColumnCount(); colIndex++){
+				String columnName = section2MetaData.getColumnName(colIndex);
+				roboscanSection2.put(columnName, resultSet2.getString(columnName));
+			}
+		}	
+		return roboscanSection2;
+	}
+	
+	private Map<String, Object> graphResult(ResultSet resultSet3) throws SQLException{
+		ResultSetMetaData section3MetaData = resultSet3.getMetaData();
+		Map<String, Object> roboscanSection3 = new LinkedHashMap<String, Object>();
+		List<String> attr = new Vector<String>();
+		List<List<String>> values = new Vector<List<String>>();
+		for(int colIndex = 1; colIndex <= section3MetaData.getColumnCount(); colIndex++){
+			attr.add(section3MetaData.getColumnName(colIndex));
+		}
+		while(resultSet3.next()){
+			List<String> record = new Vector<String>();
+			for(int colIndex = 1; colIndex <= section3MetaData.getColumnCount(); colIndex++){
+				String columnName = section3MetaData.getColumnName(colIndex);
+				record.add(resultSet3.getString(columnName));
+			}
+			values.add(record);
+		}
+		roboscanSection3.put("ATTRIBUTE", attr);
+		roboscanSection3.put("VALUES", values);
+		return roboscanSection3;
 	}
 	
 

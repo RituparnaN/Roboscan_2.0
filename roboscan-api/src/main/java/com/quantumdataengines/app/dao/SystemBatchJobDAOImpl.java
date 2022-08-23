@@ -60,7 +60,7 @@ public class SystemBatchJobDAOImpl implements SystemBatchJobDAO{
 		}
 	}
 
-	@Override
+/*	@Override
 	public boolean checkEmailAlreadyStored(Connection connection, String caseNo, String messageId,
 			String folderType) {
 		boolean isAvailable = true;
@@ -79,9 +79,9 @@ public class SystemBatchJobDAOImpl implements SystemBatchJobDAO{
 			e.printStackTrace();
 		}
 		return isAvailable;
-	}
+	}*/
 	
-	public String getEmailInternalNumber(Connection connection){
+/*	public String getEmailInternalNumber(Connection connection){
 		String internalNumber = "";
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -94,9 +94,9 @@ public class SystemBatchJobDAOImpl implements SystemBatchJobDAO{
 			e.printStackTrace();
 		}
 		return internalNumber;
-	}
+	}*/
 	
-	public boolean saveEmailDetails(Connection connection, String caseno, String messageId, String messageNumber, String emailInternalNumber, String fromId, String recipientsTO, String recipientsCC,
+/*	public boolean saveEmailDetails(Connection connection, String caseno, String messageId, String messageNumber, String emailInternalNumber, String fromId, String recipientsTO, String recipientsCC,
 			String recipientsBCC, String subject, String sentDate, String receiveDate, String messageContent, String updatedBy, String folderType){
 		PreparedStatement preparedStatement = null;
 		String query = "INSERT INTO TB_EMAILEXCHANGEDETAILS (EMAILREFERENCENO, MESSAGEID, MESSAGEUNIQUENO, MESSAGEINTERNALNO, SENDERID, RECIPIENTSTO, RECIPIENTSCC, RECIPIENTSBCC, "+
@@ -125,9 +125,9 @@ public class SystemBatchJobDAOImpl implements SystemBatchJobDAO{
 			e.printStackTrace();
 			return false;
 		}
-	}
+	}*/
 	
-	public boolean saveEmailAttachment(Connection connection, String caseno, String messageId, String messageNumber, String emailInternalNumber, 
+/*	public boolean saveEmailAttachment(Connection connection, String caseno, String messageId, String messageNumber, String emailInternalNumber, 
 			List<String> files, String updatedBy, String folderType){
 		PreparedStatement preparedStatement = null;
 		int count = 0;
@@ -173,9 +173,9 @@ public class SystemBatchJobDAOImpl implements SystemBatchJobDAO{
 			e.printStackTrace();
 			return false;
 		}
-	}
+	}*/
 	
-	@Override
+/*	@Override
 	public Map<String, String> initilizingDBSystemParameters(Connection connection) {
 		Map<String, String> systemParameters = new LinkedHashMap<String, String>();
 		PreparedStatement preparedStatement = null;
@@ -194,9 +194,9 @@ public class SystemBatchJobDAOImpl implements SystemBatchJobDAO{
 			e.printStackTrace();
 		}
 		return systemParameters;
-	}
+	}*/
 	
-	@Override
+/*	@Override
 	public void setEmailRefreshLog(Connection connection, String refreshTime, String emailCount, String status, String message, String folder, String updatedBy){
 		PreparedStatement preparedStatement = null;
 		try{
@@ -212,7 +212,7 @@ public class SystemBatchJobDAOImpl implements SystemBatchJobDAO{
 			log.error("Error while saving email refresh log : "+e.getMessage());
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	private Timestamp convertDateToTimestamp(Date date){
 		Calendar cal = Calendar.getInstance();

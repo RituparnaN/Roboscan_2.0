@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.quantumdataengines.app.service.roboscan.RoboscanService;
 
 @RestController
-@RequestMapping(value="/roboscanapi")
+@RequestMapping(value="/api/roboscanapi")
 @CrossOrigin("*")
 public class RoboscanController {
 	
@@ -41,7 +41,7 @@ public class RoboscanController {
 		List<List<String>> procedureDataList= (List<List<String>>) procedureDetails.get("list");
 		@SuppressWarnings("unchecked")
 		Map<String, Object> procedureDataMap = (Map<String, Object>) procedureDetails.get("map");
-		//List<List<String>> procedureData = roboscanService.procedureData(sections);
+		List<List<String>> procedureData = roboscanService.procedureData(sections);
 		Map<String, Object> allData = roboscanService.fetchRoboscanData(caseNos, procedureDataList, sections);
 		List<Object> listAllData = new ArrayList<Object>();
 		listAllData.add(allData);
