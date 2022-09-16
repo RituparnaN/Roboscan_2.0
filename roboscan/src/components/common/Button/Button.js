@@ -7,8 +7,8 @@ const CustomButton = (props) => {
         <Button
             variant={variants === 'primary' ? 'contained' : 'outlined'}
             type="reset"
-            className={className + ' ' + 'min-w-[200px]'}
-            sx={variants == 'primary' ? styles.primary : styles.secondary}
+            className={className + ' min-w-[200px]'}
+            sx={variants === 'primary' ? styles.primary : styles.secondary}
         >
             {children}
         </Button>

@@ -1,10 +1,8 @@
-import { BsGraphDown } from 'react-icons/bs'
-
 export const sections = [
     {
         id: 1,
         name: 'Executive Summary',
-        icon: 'executiveSummary',
+        icon: 'custDetails',
         expandable: false,
         formDetails: [{}],
         type: 'form',
@@ -30,7 +28,7 @@ export const sections = [
     {
         id: 3,
         name: 'Alert Details',
-        icon: 'alertDetails',
+        icon: 'actionItem',
         expandable: true,
         type: 'text',
         hasGraph: false,
@@ -43,8 +41,8 @@ export const sections = [
     {
         id: 4,
         name: 'Customer Overview',
-        icon: 'customerOverview',
         expandable: true,
+        icon: 'custDetails',
         type: 'graph',
         hasGraph: true,
         hasFrom: false,
@@ -139,7 +137,7 @@ export const sections = [
     {
         id: 8,
         name: 'Customer Details',
-        icon: 'customerDetails',
+        icon: 'custDetails',
         expandable: true,
         type: 'form',
         hasGraph: false,
@@ -190,7 +188,7 @@ export const sections = [
     {
         id: 9,
         name: 'Email Exchange',
-        icon: 'emailExchange',
+        icon: 'email',
         expandable: true,
         type: 'form',
         hasGraph: false,
@@ -200,13 +198,15 @@ export const sections = [
             {
                 name: 'Compose',
                 type: 'button',
-                function: 'editor',
+                function: 'modal',
+                modalType: 'compose',
                 value: 'Compose',
             },
             {
                 name: 'Inbox',
                 type: 'button',
-                function: 'inbox',
+                function: 'modal',
+                modalType: 'inbox',
                 value: 'Inbox (12 Unread)',
             },
             {
@@ -223,7 +223,7 @@ export const sections = [
     {
         id: 10,
         name: 'View Comment For Case',
-        icon: 'vcfc',
+        icon: 'viewComments',
         expandable: true,
         type: 'text',
         hasGraph: false,
@@ -244,7 +244,7 @@ export const sections = [
     {
         id: 11,
         name: 'Add/View EDD',
-        icon: 'addViewEdd',
+        icon: 'viewEdd',
         expandable: true,
         type: 'form',
         hasGraph: false,
@@ -271,7 +271,7 @@ export const sections = [
     {
         id: 12,
         name: 'View Attach Case Evidence',
-        icon: 'vace',
+        icon: 'attach',
         expandable: true,
         type: 'upload',
         hasGraph: false,
@@ -284,7 +284,7 @@ export const sections = [
     {
         id: 13,
         name: 'Customer Case History',
-        icon: 'custCaseHist',
+        icon: 'summaryDetails',
         expandable: true,
         type: 'table',
         hasGraph: false,

@@ -10,6 +10,7 @@ import {
 } from '@mui/material'
 import { MdAdb } from 'react-icons/md'
 import { pages } from '../../data/dummyData'
+import logo from 'assets/logo.png'
 
 const TopNav = () => {
     const [anchorEl, setAnchorEl] = useState(null)
@@ -24,8 +25,8 @@ const TopNav = () => {
     return (
         <AppBar position="sticky" className="bg-app-dark shadow-app-dark">
             <Toolbar disableGutters>
-                <Box className="min-w-[100px] flex justify-center items-center">
-                    <MdAdb size={38} />
+                <Box className="min-w-[100px] pl-6">
+                    <img src={logo} alt={'logo'} className="h-[100px] w-auto" />
                 </Box>
                 <Box
                     sx={{
@@ -33,22 +34,6 @@ const TopNav = () => {
                         display: { xs: 'none', md: 'flex' },
                     }}
                 >
-                    <Typography
-                        noWrap
-                        component="a"
-                        href="/"
-                        className="my-3"
-                        sx={{
-                            mr: 2,
-                            display: { xs: 'none', md: 'flex' },
-                            fontWeight: 500,
-                            color: 'inherit',
-                            textDecoration: 'none',
-                            fontSize: '37px',
-                        }}
-                    >
-                        Roboscan
-                    </Typography>
                     {pages.map((page, index) => (
                         <React.Fragment key={page.id}>
                             <Button

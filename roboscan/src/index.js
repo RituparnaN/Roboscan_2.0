@@ -9,7 +9,10 @@ import {
     ThemeProvider,
     styled,
     StyledEngineProvider,
+    createRoot,
 } from '@mui/material/styles'
+
+const rootElement = document.getElementById('root')
 
 const theme = createTheme({
     typography: {
@@ -17,19 +20,26 @@ const theme = createTheme({
             '"GoogleSans-Regular", "Segoe UI", Roboto, Helvetica Neue, Arial, sans-serif',
         fontSize: 16,
     },
+    components: {
+        MuiDialog: {
+            defaultProps: {
+                container: rootElement,
+            },
+        },
+    },
 })
 
-const root = ReactDOM.createRoot(document.getElementById('root'))
+const root = ReactDOM.createRoot(rootElement)
 
 root.render(
     <React.StrictMode>
-        <StyledEngineProvider injectFirst>
-            <ThemeProvider theme={theme}>
+        <ThemeProvider theme={theme}>
+            <StyledEngineProvider injectFirst>
                 <Layout>
                     <App />
                 </Layout>
-            </ThemeProvider>
-        </StyledEngineProvider>
+            </StyledEngineProvider>
+        </ThemeProvider>
     </React.StrictMode>
 )
 

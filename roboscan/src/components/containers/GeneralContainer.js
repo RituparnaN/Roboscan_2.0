@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactEcharts from 'echarts-for-react'
 import { Box, Typography, IconButton } from '@mui/material'
 import { BsArrowUpRightCircle, BsArrowDownRightCircle } from 'react-icons/bs'
-import { chartConfig } from '../../data/dummyData'
-import DataGrid from '../common/DataGrid'
-import FormContainer from '../modules/FormContainer'
+import { chartConfig } from 'data/dummyData'
+import DataGrid from 'components/common/DataGrid'
+import FormContainer from 'components/modules/FormContainer'
 
 const GeneralContainer = (props) => {
     const {
@@ -77,7 +77,11 @@ const GeneralContainer = (props) => {
                 ) : type === 'table' ? (
                     <DataGrid />
                 ) : type === 'form' ? (
-                    <FormContainer formData={formData} />
+                    <FormContainer
+                        sectionId={sectionId}
+                        formData={formData}
+                        expanded={expanded}
+                    />
                 ) : (
                     <>{children}</>
                 )}

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
     TextField,
     Box,
@@ -7,18 +7,31 @@ import {
     Checkbox,
     Button,
 } from '@mui/material'
+import Modal from 'components/common/Modal'
 
 const FormContainer = (props) => {
-    const { formData, expanded = false } = props
+    const { formData, expanded = false, sectionId } = props
 
-    const dataToShow = expanded ? formData : formData.slice(0, 4)
+    const [modalOpen, setModalOpen] = useState(false)
+    const [modalContentType, setModalContentType] = useState('')
+
+    const dataToShow = expanded.includes(sectionId)
+        ? formData
+        : formData.slice(0, 4)
+
+    const functionByType = (field) => {
+        if (field.function && field.function === 'modal') {
+            setModalContentType(field.modalType || 'error_404')
+            setModalOpen(true)
+        }
+    }
 
     return (
         <Box>
             <Grid container className="mt-8">
                 {formData &&
                     dataToShow.map((field, index) => (
-                        <>
+                        <React.Fragment key={index}>
                             {field.type === 'button' ? (
                                 <Grid item xs={12}>
                                     <Box
@@ -28,6 +41,9 @@ const FormContainer = (props) => {
                                         <Button
                                             className="bg-white w-full text-app-dark"
                                             variant="contained"
+                                            onClick={() =>
+                                                functionByType(field)
+                                            }
                                         >
                                             {field.value}
                                         </Button>
@@ -70,8 +86,13 @@ const FormContainer = (props) => {
                                     )}
                                 </Grid>
                             )}
-                        </>
+                        </React.Fragment>
                     ))}
+                <Modal
+                    contentType={modalContentType}
+                    setModalOpen={setModalOpen}
+                    modalOpen={modalOpen}
+                />
             </Grid>
         </Box>
     )

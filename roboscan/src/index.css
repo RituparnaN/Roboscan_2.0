@@ -31,6 +31,12 @@ body {
     -moz-osx-font-smoothing: grayscale;
     max-height: 100vh;
     overflow: hidden;
+
+    --jd-color-panel: #e4e8ec;
+}
+.jodit-toolbar__box,
+.jodit-toolbar__box:not(:empty) {
+    background-color: #e4e8ec !important;
 }
 
 code {
