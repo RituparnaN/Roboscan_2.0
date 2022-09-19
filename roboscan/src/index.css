@@ -36,7 +36,11 @@ body {
 }
 .jodit-toolbar__box,
 .jodit-toolbar__box:not(:empty) {
-    background-color: #e4e8ec !important;
+    background-color: #f5f6fa !important;
+}
+
+.jodit-container {
+    border-radius: 0px !important;
 }
 
 code {

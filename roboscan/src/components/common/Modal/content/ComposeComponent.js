@@ -33,6 +33,9 @@ import {
     BsFileText,
     BsFileTextFill,
     BsPencil,
+    BsPaperclip,
+    BsFileEarmarkPdf,
+    BsFillArrowRightCircleFill,
 } from 'react-icons/bs'
 
 import { BiCircle, BiSearch } from 'react-icons/bi'
@@ -48,31 +51,31 @@ const menuOptions = [
         id: '1',
         name: 'Inbox',
         icon: <BsInbox size={24} />,
-        iconAlt: <BsInboxFill size={24} />,
+        iconAlt: <BsInboxFill size={24} color="#6dc993" />,
     },
     {
         id: '2',
         name: 'Liked',
         icon: <IoMdHeartEmpty size={24} />,
-        iconAlt: <IoMdHeart size={24} />,
+        iconAlt: <IoMdHeart size={24} color="#fb3958" />,
     },
     {
         id: '3',
         name: 'Draft',
         icon: <BsFileText size={24} />,
-        iconAlt: <BsFileTextFill size={24} />,
+        iconAlt: <BsFileTextFill size={24} color="#ffbd2e" />,
     },
     {
         id: '4',
         name: 'Sent',
         icon: <IoPaperPlaneOutline size={24} />,
-        iconAlt: <IoPaperPlane size={24} />,
+        iconAlt: <IoPaperPlane size={24} color="#313679" />,
     },
     {
         id: '5',
         name: 'Trash',
         icon: <BsTrash size={24} />,
-        iconAlt: <BsTrashFill size={24} />,
+        iconAlt: <BsTrashFill size={24} color="crimson" />,
     },
 ]
 
@@ -110,6 +113,23 @@ const dummyMails = [
         body: 'Lorem Ipsum Dolor Sit Amet Consectur Alpin Dolor Sit Conscetore Amit Lorem Dem Ipsum!',
         label: 'Personal',
         color: '#e14066',
+        attachments: [
+            {
+                id: '1',
+                name: 'AuditFile.pdf',
+                filePath: '',
+            },
+            {
+                id: '2',
+                name: 'AutoPDF.pdf',
+                filePath: '',
+            },
+            {
+                id: '3',
+                name: 'AutoPDF.pdf',
+                filePath: '',
+            },
+        ],
     },
     {
         id: '3',
@@ -151,9 +171,11 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
     const editor = useRef(null)
 
     const [content, setContent] = useState('')
+    const [hovered, setHovered] = useState(null)
     const [composing, setComposing] = useState(false)
     const [expandedMail, setExpandedMail] = useState(null)
     const [alertOpen, setAlertOpen] = useState(false)
+    const [selectedList, setSelectedList] = useState(0)
 
     const handleAlertOpen = () => {
         setAlertOpen(true)
@@ -197,7 +219,7 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
         }
         if (composing === true) {
             if (content !== '') {
-                setAlertOpen(true)
+                handleAlertOpen()
                 return
             }
             setComposing(false)
@@ -236,9 +258,29 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
                     </Button>
                     <MenuList className="mb-12">
                         {menuOptions.map((option, index) => (
-                            <MenuItem className="mb-6">
+                            <MenuItem
+                                className="mb-6"
+                                onMouseEnter={() => {
+                                    setHovered(index)
+                                }}
+                                onMouseLeave={() => {
+                                    setHovered(null)
+                                }}
+                                onClick={() => {
+                                    setSelectedList(index)
+                                }}
+                                key={index}
+                                sx={{
+                                    bgcolor:
+                                        selectedList === index
+                                            ? '#f5f5f5'
+                                            : 'transparent',
+                                }}
+                            >
                                 <ListItemIcon className="mr-4">
-                                    {option.icon}
+                                    {hovered === index || selectedList === index
+                                        ? option.iconAlt
+                                        : option.icon}
                                 </ListItemIcon>
                                 <ListItemText>{option.name}</ListItemText>
                             </MenuItem>
@@ -249,7 +291,7 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
                     </Typography>
                     <MenuList className="mb-6">
                         {labelOptions.map((option, index) => (
-                            <MenuItem className="mb-3">
+                            <MenuItem className="mb-3" key={index}>
                                 <ListItemIcon className="mr-4">
                                     <BiCircle size={24} color={option.color} />
                                 </ListItemIcon>
@@ -292,6 +334,7 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
                             <MenuItem
                                 onClick={() => handleMailClick(mail)}
                                 className="bg-white hover:bg-[#ddd] p-0 py-4 mb-4 flex flex-col justify-center items-start"
+                                key={index}
                             >
                                 {/* <Box> */}
                                 <Box
@@ -322,6 +365,25 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
                                         {mail.body}
                                     </Typography>
                                 </Box>
+                                {mail.attachments && mail.attachments.length && (
+                                    <Box className="flex flex-row justify-start items-center px-10  ">
+                                        <BsPaperclip size={24} />
+                                        <Box className="flex flex-row justify-start items-center ml-5 mr-4 border-[0.5px] border-solid border-slate-400">
+                                            <Box className="border-r-[0.5px] border-solid border-slate-400 border-l-0 border-t-0 border-b-0 px-2 align-center pt-2">
+                                                <BsFileEarmarkPdf size={18} />
+                                            </Box>
+
+                                            <Typography className="font-bold ml-2 mr-2 text-sm">
+                                                {mail.attachments[0].name},
+                                            </Typography>
+                                        </Box>
+
+                                        <Typography className="font-bold">
+                                            +{mail.attachments.length - 1}
+                                        </Typography>
+                                    </Box>
+                                )}
+
                                 {/* </Box> */}
                             </MenuItem>
                         ))}
@@ -367,7 +429,7 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
                             </Typography>
                         </Box>
                         <Box className="mt-8">
-                            <Box className="bg-[#e4e8ec] p-2 rounded-t-lg flex flex-row justify-between items-center">
+                            <Box className="bg-[#f5f6fa] p-2 rounded-t-lg flex flex-row justify-between items-center border-solid border-[0.5px] border-gray-300 border-b-0">
                                 <Typography className="font-bold mr-3 ml-1">
                                     To:
                                 </Typography>
@@ -376,7 +438,7 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
                                     placeholder="example@email.com...."
                                 />
                             </Box>
-                            <Box className="bg-[#e4e8ec] p-2 flex flex-row justify-between items-center">
+                            <Box className="bg-[#f5f6fa] p-2 flex flex-row justify-between items-center  border-solid border-[0.5px] border-gray-300 border-b-0">
                                 <Typography className="font-bold mr-3 ml-1">
                                     Subject:
                                 </Typography>
@@ -385,6 +447,7 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
                                     placeholder="Subject of the mail...."
                                 />
                             </Box>
+
                             <JoditEditor
                                 ref={editor}
                                 value={content}
@@ -393,6 +456,23 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
                                 onBlur={(newContent) => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
                                 onChange={(newContent) => {}}
                             />
+
+                            <Box className="bg-[#f5f6fa] p-2 flex flex-row justify-between items-center  border-solid border-[0.5px] border-gray-300 border-t-0 py-4">
+                                <Typography className="font-bold mr-3 ml-1">
+                                    Subject:
+                                </Typography>
+                                <Button
+                                    variant="contained"
+                                    className="bg-app-dark text-white hover:bg-[#000] normal-case py-2 px-0 pl-2 pr-3 rounded-full text-lg"
+                                    onClick={() => handleCompose()}
+                                >
+                                    <BsFillArrowRightCircleFill
+                                        size={26}
+                                        className="mr-3"
+                                    />{' '}
+                                    Send Mail
+                                </Button>
+                            </Box>
                         </Box>
                     </Grid>
                 )}
