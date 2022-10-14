@@ -7,7 +7,7 @@ import Button from './components/common/Button'
 function App() {
     const [expanded, setExpanded] = useState([])
 
-    const sizeCondition = (section) => {
+    const sizeCondition = (section, size) => {
         if (
             section.type === 'table' ||
             section.type === 'upload' ||
@@ -17,19 +17,21 @@ function App() {
             return 12
         } else if (expanded.includes(section.id + 1)) {
             return true
-        } else return 4
+        } else return size === 'lg' ? 4 : size === 'md' ? 6 : 12
     }
 
     return (
         <Grid
             container
-            className="h-[calc(100vh-79px)] px-2 py-5 overflow-auto"
+            className="h-[calc(100vh-79px)] px-2 py-8 overflow-auto"
         >
             {sections &&
                 sections.map((sec, index) => (
                     <Grid
                         item
-                        xs={sizeCondition(sec)}
+                        xs={sizeCondition(sec, 'xs')}
+                        md={sizeCondition(sec, 'md')}
+                        lg={sizeCondition(sec, 'lg')}
                         key={sec.id}
                         className="transition-all duration-500"
                     >
@@ -46,6 +48,7 @@ function App() {
                             formData={sec.formData || []}
                             expanded={expanded}
                             setExpanded={setExpanded}
+                            {...sec}
                         >
                             Other Container
                         </GeneralContainer>

@@ -5,13 +5,13 @@ import TopNav from './topnav'
 
 const Layout = ({ children }) => {
     return (
-        <Box>
+        <Box className="w-[100vw]">
             <TopNav />
-            <Box className="flex flex-row ">
-                <Box className="min-w-[100px]">
+            <Box className="flex flex-row w-[100vw]">
+                <Box className="min-w-[100px] h-[100vh]">
                     <SideNav />
                 </Box>
-                <Box>{children}</Box>
+                <Box className="w-[calc(100vw-100px)]">{children}</Box>
             </Box>
             {/* <Grid container>
                 <Grid item className="w-[100px]">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useMemo, useRef } from 'react'
 import {
     Box,
     IconButton,
@@ -15,6 +15,9 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Snackbar,
+    Alert,
+    Slide,
 } from '@mui/material'
 import {
     BsArrowDownLeftCircle,
@@ -175,7 +178,13 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
     const [composing, setComposing] = useState(false)
     const [expandedMail, setExpandedMail] = useState(null)
     const [alertOpen, setAlertOpen] = useState(false)
+    const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [selectedList, setSelectedList] = useState(0)
+    const [hoveredLogo, setHoveredLogo] = useState('')
+    const [snackbarType, setSnackbarType] = useState('success')
+    const [snackbarMessage, setSnackbarMessage] = useState(
+        'Mail Sent Successfully!'
+    )
 
     const handleAlertOpen = () => {
         setAlertOpen(true)
@@ -192,6 +201,11 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
         setComposing(false)
         setAlertOpen(false)
     }
+
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false)
+    }
+
     const config = useMemo(
         () => ({
             readonly: false,
@@ -208,10 +222,6 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
         [placeholder]
     )
 
-    useEffect(() => {
-        console.log('Content:-', content)
-    }, [content])
-
     const handleCompose = () => {
         if (composing === false) {
             setComposing(true)
@@ -227,10 +237,21 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
         }
     }
 
+    const handleSend = () => {
+        setSnackbarMessage('Mail Sent Successfully!')
+        setSnackbarType('success')
+        setComposing(false)
+        setSnackbarOpen(true)
+    }
+
     const handleMailClick = (mail) => {
         if (expandedMail === null) {
             setExpandedMail(mail)
         }
+    }
+
+    const SlideTransition = (props) => {
+        return <Slide {...props} direction="up" />
     }
 
     return (
@@ -333,12 +354,12 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
                         {dummyMails.map((mail, index) => (
                             <MenuItem
                                 onClick={() => handleMailClick(mail)}
-                                className="bg-white hover:bg-[#ddd] p-0 py-4 mb-4 flex flex-col justify-center items-start"
+                                className="bg-white hover:bg-[#ddd] p-0 py-2 mb-4 flex flex-col justify-center items-start"
                                 key={index}
                             >
                                 {/* <Box> */}
                                 <Box
-                                    className="pl-10 pr-3 py-3 mt-5 mb-5 flex flex-row justify-between items-center"
+                                    className="pl-10 pr-3 py-3 mt-3 mb-3 flex flex-row justify-between items-center"
                                     sx={{
                                         borderLeftColor: mail.color,
                                         borderLeftStyle: 'solid',
@@ -357,7 +378,7 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
                                         </Typography>
                                     </Box>
                                 </Box>
-                                <Box className="pl-11 w-[80%] pr-5 py-5">
+                                <Box className="pl-11 w-[80%] pr-5 py-2 pb-3">
                                     <Typography className="mb-5">
                                         {mail.subject}
                                     </Typography>
@@ -366,7 +387,7 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
                                     </Typography>
                                 </Box>
                                 {mail.attachments && mail.attachments.length && (
-                                    <Box className="flex flex-row justify-start items-center px-10  ">
+                                    <Box className="flex flex-row justify-start items-center px-10 my-2">
                                         <BsPaperclip size={24} />
                                         <Box className="flex flex-row justify-start items-center ml-5 mr-4 border-[0.5px] border-solid border-slate-400">
                                             <Box className="border-r-[0.5px] border-solid border-slate-400 border-l-0 border-t-0 border-b-0 px-2 align-center pt-2">
@@ -400,23 +421,75 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
                     >
                         <Box className="flex flex-row justify-between items-center w-[100%] mb-14 ">
                             <Box className="flex flex-row justify-start items-center">
-                                <IconButton className="mr-2">
-                                    <IoMdHeartEmpty size={30} />
+                                <IconButton
+                                    className="mr-2"
+                                    onMouseEnter={() => setHoveredLogo('heart')}
+                                    onMouseLeave={() => setHoveredLogo('')}
+                                >
+                                    {hoveredLogo === 'heart' ? (
+                                        <IoMdHeart size={30} />
+                                    ) : (
+                                        <IoMdHeartEmpty size={30} />
+                                    )}
                                 </IconButton>
-                                <IconButton className="mr-2">
-                                    <BsReply size={30} />
+                                <IconButton
+                                    className="mr-2"
+                                    onMouseEnter={() => setHoveredLogo('reply')}
+                                    onMouseLeave={() => setHoveredLogo('')}
+                                >
+                                    {hoveredLogo === 'reply' ? (
+                                        <BsReplyFill size={30} />
+                                    ) : (
+                                        <BsReply size={30} />
+                                    )}
                                 </IconButton>
-                                <IconButton className="mr-2">
-                                    <BsReplyAll size={30} />
+                                <IconButton
+                                    className="mr-2"
+                                    onMouseEnter={() =>
+                                        setHoveredLogo('replyall')
+                                    }
+                                    onMouseLeave={() => setHoveredLogo('')}
+                                >
+                                    {hoveredLogo === 'replyall' ? (
+                                        <BsReplyAllFill size={30} />
+                                    ) : (
+                                        <BsReplyAll size={30} />
+                                    )}
                                 </IconButton>
-                                <IconButton className="mr-2">
-                                    <BsForward size={30} />
+                                <IconButton
+                                    className="mr-2"
+                                    onMouseEnter={() => setHoveredLogo('fwd')}
+                                    onMouseLeave={() => setHoveredLogo('')}
+                                >
+                                    {hoveredLogo === 'fwd' ? (
+                                        <BsForwardFill size={30} />
+                                    ) : (
+                                        <BsForward size={30} />
+                                    )}
                                 </IconButton>
-                                <IconButton className="mr-2">
-                                    <BsFolder size={30} />
+                                <IconButton
+                                    className="mr-2"
+                                    onMouseEnter={() =>
+                                        setHoveredLogo('folder')
+                                    }
+                                    onMouseLeave={() => setHoveredLogo('')}
+                                >
+                                    {hoveredLogo === 'folder' ? (
+                                        <BsFolderFill size={30} />
+                                    ) : (
+                                        <BsFolder size={30} />
+                                    )}
                                 </IconButton>
-                                <IconButton className="mr-2">
-                                    <BsTrash size={30} />
+                                <IconButton
+                                    className="mr-2"
+                                    onMouseEnter={() => setHoveredLogo('trash')}
+                                    onMouseLeave={() => setHoveredLogo('')}
+                                >
+                                    {hoveredLogo === 'trash' ? (
+                                        <BsTrashFill size={30} />
+                                    ) : (
+                                        <BsTrash size={30} />
+                                    )}
                                 </IconButton>
                             </Box>
                             <IconButton onClick={() => handleModalClose()}>
@@ -458,13 +531,17 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
                             />
 
                             <Box className="bg-[#f5f6fa] p-2 flex flex-row justify-between items-center  border-solid border-[0.5px] border-gray-300 border-t-0 py-4">
-                                <Typography className="font-bold mr-3 ml-1">
-                                    Subject:
-                                </Typography>
+                                <Button
+                                    variant="outlined"
+                                    className="font-bold mr-3 ml-1 text-app-dark border-app-dark hover:bg-gray-200"
+                                >
+                                    <BsPaperclip size={24} />
+                                    Attach
+                                </Button>
                                 <Button
                                     variant="contained"
                                     className="bg-app-dark text-white hover:bg-[#000] normal-case py-2 px-0 pl-2 pr-3 rounded-full text-lg"
-                                    onClick={() => handleCompose()}
+                                    onClick={() => handleSend()}
                                 >
                                     <BsFillArrowRightCircleFill
                                         size={26}
@@ -517,6 +594,21 @@ const ComposeComponent = ({ handleModalClose, handleModalOpen }) => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleSnackbarClose}
+                TransitionComponent={SlideTransition}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={handleSnackbarClose}
+                    severity={snackbarType}
+                    sx={{ width: '100%' }}
+                >
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Box>
     )
 }

@@ -22,7 +22,9 @@
     font-weight: normal;
     font-style: normal;
 }
-
+html {
+    min-width: 100%;
+}
 body {
     margin: 0;
     font-family: 'GoogleSans-Regular', -apple-system, BlinkMacSystemFont,
@@ -31,6 +33,7 @@ body {
     -moz-osx-font-smoothing: grayscale;
     max-height: 100vh;
     overflow: hidden;
+    min-width: 100vw;
 
     --jd-color-panel: #e4e8ec;
 }
@@ -46,4 +49,9 @@ body {
 code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
         monospace;
+}
+
+.rdg-cell[role='columnheader'] {
+    box-shadow: 0 10px 10px -3px rgb(0 0 0 / 0.05),
+        0 4px 4px -4px rgb(0 0 0 / 0.05);
 }

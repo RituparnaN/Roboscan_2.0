@@ -1,13 +1,5 @@
-import React, { useEffect } from 'react'
-import {
-    Box,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    IconButton,
-} from '@mui/material'
-import { BsArrowDownLeftCircle } from 'react-icons/bs'
+import React from 'react'
+import { Dialog } from '@mui/material'
 import modalContentMapping from './content'
 
 const Modal = ({ contentType, modalOpen, setModalOpen }) => {
@@ -18,10 +10,6 @@ const Modal = ({ contentType, modalOpen, setModalOpen }) => {
     const handleClickClose = () => {
         setModalOpen(false)
     }
-
-    useEffect(() => {
-        console.log('ContentType', modalContentMapping[contentType])
-    })
 
     let ModalContent = modalContentMapping[contentType]
         ? modalContentMapping[contentType]

@@ -23,7 +23,10 @@ const TopNav = () => {
     }
 
     return (
-        <AppBar position="sticky" className="bg-app-dark shadow-app-dark">
+        <AppBar
+            position="sticky"
+            className="bg-app-dark shadow-app-dark min-w-[100vw]"
+        >
             <Toolbar disableGutters>
                 <Box className="min-w-[100px] pl-6">
                     <img src={logo} alt={'logo'} className="h-[100px] w-auto" />
@@ -33,13 +36,14 @@ const TopNav = () => {
                         flexGrow: 1,
                         display: { xs: 'none', md: 'flex' },
                     }}
+                    className="ml-5"
                 >
                     {pages.map((page, index) => (
                         <React.Fragment key={page.id}>
                             <Button
                                 id={page.title}
                                 className={
-                                    'text-white mx-0 px-11 hover:bg-[#2b313f] text-lg' +
+                                    'text-white rounded-none mx-0 px-11 my-0 hover:bg-[#2b313f] text-lg min-h-[90px]' +
                                     ' ' +
                                     (Boolean(anchorEl && anchorEl[index]) &&
                                         'bg-[#2b313f]')

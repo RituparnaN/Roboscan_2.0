@@ -6,18 +6,27 @@ import {
     Grid,
     Checkbox,
     Button,
+    RadioGroup,
+    Radio,
+    FormControl,
+    FormLabel,
+    FormControlLabel,
 } from '@mui/material'
 import Modal from 'components/common/Modal'
 
 const FormContainer = (props) => {
-    const { formData, expanded = false, sectionId } = props
+    const { formData, expanded, sectionId } = props
+
+    const isExpanded =
+        expanded.includes(sectionId) || sectionId === 1 ? true : false
 
     const [modalOpen, setModalOpen] = useState(false)
     const [modalContentType, setModalContentType] = useState('')
 
-    const dataToShow = expanded.includes(sectionId)
-        ? formData
-        : formData.slice(0, 4)
+    const dataToShow =
+        expanded.includes(sectionId) || sectionId === 1
+            ? formData
+            : formData.slice(0, 3)
 
     const functionByType = (field) => {
         if (field.function && field.function === 'modal') {
@@ -50,33 +59,83 @@ const FormContainer = (props) => {
                                     </Box>
                                 </Grid>
                             ) : (
-                                <Grid item xs={expanded ? 6 : 12}>
+                                <>
                                     {field.type === 'text' ? (
                                         <Grid
-                                            container
-                                            className="mb-2"
-                                            alignItems={'center'}
-                                            spacing={2}
-                                            key={index}
+                                            item
+                                            lg={
+                                                !isExpanded ||
+                                                (formData.length % 2 !== 0 &&
+                                                    index ===
+                                                        formData.length - 1)
+                                                    ? 12
+                                                    : 6
+                                            }
+                                            xs={12}
                                         >
-                                            <Grid item xs={4}>
-                                                <Typography align="right">
+                                            {/* <Box className="flex flex-row justify-start items-start mb-5"> */}
+                                            <Box className="flex flex-col justify-start items-start mb-6 pr-5">
+                                                <Typography className="mr-5 min-w-fit mb-2 ml-2">
                                                     {field.name}
                                                 </Typography>
-                                            </Grid>
-                                            <Grid item xs={8}>
+
                                                 <TextField
                                                     value={field.value}
                                                     variant="outlined"
-                                                    className="w-full"
+                                                    className="w-full mr-5 bg-white"
                                                     disabled
                                                 />
-                                            </Grid>
+                                            </Box>
+                                        </Grid>
+                                    ) : field.type === 'textarea' ? (
+                                        <Grid item xs={12}>
+                                            {/* <Box className="flex flex-row justify-start items-start mb-5"> */}
+                                            <Box className="flex flex-col justify-start items-start mb-6">
+                                                <Typography className="mr-5 min-w-fit mb-2 ml-2">
+                                                    {field.name}
+                                                </Typography>
+
+                                                <TextField
+                                                    value={field.value}
+                                                    variant="outlined"
+                                                    className="w-full mr-5 bg-white"
+                                                    multiline
+                                                    rows={4}
+                                                    disabled
+                                                />
+                                            </Box>
                                         </Grid>
                                     ) : field.type === 'check' ? (
                                         <Box key={index}>
                                             <Checkbox />
                                         </Box>
+                                    ) : field.type === 'radio' ? (
+                                        <Grid item xs={12} key={index}>
+                                            <Box className="flex flex-row justify-start items-center mt-5 mb-5">
+                                                <Typography className="min-w-fit mr-10">
+                                                    {field.name}
+                                                </Typography>
+                                                <RadioGroup
+                                                    name={field.name}
+                                                    value={field.value}
+                                                    className="flex flex-row justify-between items-center w-[25%]"
+                                                >
+                                                    {field.options.map(
+                                                        (option, index) => (
+                                                            <FormControlLabel
+                                                                value={option}
+                                                                control={
+                                                                    <Radio />
+                                                                }
+                                                                label={option}
+                                                                disabled
+                                                                key={option}
+                                                            />
+                                                        )
+                                                    )}
+                                                </RadioGroup>
+                                            </Box>
+                                        </Grid>
                                     ) : (
                                         <Box key={index}>
                                             <Typography>
@@ -84,7 +143,7 @@ const FormContainer = (props) => {
                                             </Typography>
                                         </Box>
                                     )}
-                                </Grid>
+                                </>
                             )}
                         </React.Fragment>
                     ))}

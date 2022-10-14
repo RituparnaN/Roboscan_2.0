@@ -36,8 +36,8 @@ const SideNav = () => {
     }
 
     return (
-        <Box className="h-[calc(100vh-78px)] overflow-auto bg-app-dark">
-            <MenuList className="px-auto py-0">
+        <Box className="overflow-hidden hover:overflow-auto h-[calc(100vh-78px)] bg-app-dark">
+            <MenuList className="px-auto pb-10">
                 {sections.map((sec) => (
                     <CustomTooltip
                         placement={'right'}
