@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Box, Switch, Stack, Typography, InputBase } from '@mui/material'
+import { Box, Switch, Stack, Typography, InputBase, Button } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 import ExportDropdown from './ExportDropdown'
@@ -7,6 +7,8 @@ import FreezeDropdown from './FreezeDropdown'
 import ReorderDropdown from './ReorderDropdown'
 import { BiSearch } from 'react-icons/bi'
 import { RiEye2Fill } from 'react-icons/ri'
+import { FaFilter } from 'react-icons/fa'
+import { MdNotInterested } from 'react-icons/md'
 
 const Toolbar = (props) => {
     const {
@@ -23,6 +25,10 @@ const Toolbar = (props) => {
         setShowSelected,
         setCurrentPage,
         selectedGridElement,
+        searchString,
+        setSearchString,
+        filterActive,
+        setFilterActive
     } = props
 
     const CustomSwitch = styled(Switch)(({ theme }) => ({
@@ -71,7 +77,7 @@ const Toolbar = (props) => {
                     sx={{ ml: 1, flex: 1 }}
                     placeholder="Search"
                     inputProps={{ 'aria-label': 'search mails' }}
-                    onChange={() => {}}
+                    onChange={(e) => setSearchString(e.target.value)}
                 />
                 <BiSearch size={24} />
             </Box>
@@ -113,18 +119,13 @@ const Toolbar = (props) => {
                         </Typography>
                     </Stack>
                 )}
-                {isSelected && (
-                    <ExportDropdown
-                        title={title}
-                        btnText={'Export Selected'}
-                        gridElement={selectedGridElement}
-                    />
-                )}
 
                 <ExportDropdown
                     title={title}
                     btnText={'Export'}
                     gridElement={gridElement}
+                    isSelected={isSelected}
+                    selectedGridElement={selectedGridElement}
                 />
                 <FreezeDropdown
                     checkedState={checkedState}
@@ -140,6 +141,17 @@ const Toolbar = (props) => {
                     setColumns={setColumns}
                     utilColumn={utilColumn}
                 />
+
+                <Button
+                    className="rounded-lg px-5 py-2 normal-case bg-app-dark hover:bg-black mx-2 my-3 text-sm"
+                    variant="contained"
+                    size="small"
+                    onClick={()=>setFilterActive(!filterActive)}
+                >
+                    {filterActive ? <MdNotInterested size={16} className="mr-3" /> : <FaFilter size={14} className="mr-3" /> }
+                    {filterActive ? 'Remove Filters' : 'Add Filters'}
+            </Button>
+
             </Box>
         </Box>
     )

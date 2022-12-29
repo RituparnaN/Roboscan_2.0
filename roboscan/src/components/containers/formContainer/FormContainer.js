@@ -12,25 +12,28 @@ import {
     FormLabel,
     FormControlLabel,
 } from '@mui/material'
+import moment from 'moment'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import Modal from 'components/common/Modal'
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 
 const FormContainer = (props) => {
-    const { formData, expanded, sectionId } = props
+    const { formDetails, expanded, sectionId } = props
 
     const isExpanded =
-        expanded.includes(sectionId) || sectionId === 1 ? true : false
+        expanded.includes(sectionId) || sectionId === 0 ? true : false
 
     const [modalOpen, setModalOpen] = useState(false)
     const [modalContentType, setModalContentType] = useState('')
 
     const dataToShow =
-        expanded.includes(sectionId) || sectionId === 1
-            ? formData
-            : formData.slice(0, 3)
+        expanded.includes(sectionId) ||  sectionId === 0
+            ? formDetails
+            : formDetails.length > 2 ? formDetails.filter(e=>e.inputType !== 'textarea').slice(0, 3) : formDetails.slice(0, 3);
 
     const functionByType = (field) => {
         if (field.function && field.function === 'modal') {
-            setModalContentType(field.modalType || 'error_404')
+            setModalContentType(field.modalDetails.moduleType || 'error_404')
             setModalOpen(true)
         }
     }
@@ -38,10 +41,10 @@ const FormContainer = (props) => {
     return (
         <Box>
             <Grid container className="mt-8">
-                {formData &&
+                {formDetails &&
                     dataToShow.map((field, index) => (
                         <React.Fragment key={index}>
-                            {field.type === 'button' ? (
+                            {field.inputType === 'button' ? (
                                 <Grid item xs={12}>
                                     <Box
                                         key={index}
@@ -54,20 +57,20 @@ const FormContainer = (props) => {
                                                 functionByType(field)
                                             }
                                         >
-                                            {field.value}
+                                            {field.label}
                                         </Button>
                                     </Box>
                                 </Grid>
                             ) : (
                                 <>
-                                    {field.type === 'text' ? (
+                                    {field.inputType === 'text' ? (
                                         <Grid
                                             item
                                             lg={
                                                 !isExpanded ||
-                                                (formData.length % 2 !== 0 &&
+                                                (formDetails.length % 2 !== 0 &&
                                                     index ===
-                                                        formData.length - 1)
+                                                        formDetails.length - 1)
                                                     ? 12
                                                     : 6
                                             }
@@ -80,36 +83,52 @@ const FormContainer = (props) => {
                                                 </Typography>
 
                                                 <TextField
-                                                    value={field.value}
+                                                    value={field.value||"N.A"}
                                                     variant="outlined"
                                                     className="w-full mr-5 bg-white"
                                                     disabled
                                                 />
                                             </Box>
                                         </Grid>
-                                    ) : field.type === 'textarea' ? (
+                                    ) : field.inputType === 'textarea' ? (
                                         <Grid item xs={12}>
                                             {/* <Box className="flex flex-row justify-start items-start mb-5"> */}
-                                            <Box className="flex flex-col justify-start items-start mb-6">
+                                            <Box className="flex flex-col justify-start items-start mb-6 mr-5">
                                                 <Typography className="mr-5 min-w-fit mb-2 ml-2">
                                                     {field.name}
                                                 </Typography>
 
                                                 <TextField
-                                                    value={field.value}
+                                                    value={field.value||"N.A"}
                                                     variant="outlined"
-                                                    className="w-full mr-5 bg-white"
+                                                    className="w-full bg-white"
                                                     multiline
                                                     rows={4}
                                                     disabled
                                                 />
                                             </Box>
                                         </Grid>
-                                    ) : field.type === 'check' ? (
-                                        <Box key={index}>
-                                            <Checkbox />
-                                        </Box>
-                                    ) : field.type === 'radio' ? (
+                                    ) : field.inputType === 'checkbox' ? (
+                                        <Grid 
+                                            item 
+                                            lg={
+                                                !isExpanded ||
+                                                (formDetails.length % 2 !== 0 &&
+                                                    index ===
+                                                        formDetails.length - 1)
+                                                    ? 12
+                                                    : 4
+                                            }
+                                            xs={12} 
+                                        >
+                                            <Box key={index} className="flex flex-row justify-start items-center" >
+                                                <Checkbox />
+                                                <Typography className="min-w-fit ml-2 mt-1">
+                                                    {field.name}
+                                                </Typography>
+                                            </Box>
+                                        </Grid>
+                                    ) : field.inputType === 'radio' ? (
                                         <Grid item xs={12} key={index}>
                                             <Box className="flex flex-row justify-start items-center mt-5 mb-5">
                                                 <Typography className="min-w-fit mr-10">
@@ -117,10 +136,10 @@ const FormContainer = (props) => {
                                                 </Typography>
                                                 <RadioGroup
                                                     name={field.name}
-                                                    value={field.value}
+                                                    value={field.value||"N.A"}
                                                     className="flex flex-row justify-between items-center w-[25%]"
                                                 >
-                                                    {field.options.map(
+                                                    {/* {field.options.map(
                                                         (option, index) => (
                                                             <FormControlLabel
                                                                 value={option}
@@ -132,8 +151,35 @@ const FormContainer = (props) => {
                                                                 key={option}
                                                             />
                                                         )
-                                                    )}
+                                                    )} */}
                                                 </RadioGroup>
+                                            </Box>
+                                        </Grid>
+                                    ) : field.inputType === 'date' ? (
+                                        <Grid 
+                                            item 
+                                            lg={
+                                                !isExpanded ||
+                                                (formDetails.length % 2 !== 0 &&
+                                                    index ===
+                                                        formDetails.length - 1)
+                                                    ? 12
+                                                    : 6
+                                            }
+                                            xs={12}
+                                        >
+                                            <Box className="flex flex-col justify-start items-start mb-6" >
+                                                <Typography className="mr-5 min-w-fit mb-2 ml-2">
+                                                    {field.name}
+                                                </Typography>
+                                                <LocalizationProvider dateAdapter={AdapterMoment}>
+                                                    <DatePicker
+                                                        value={field.value|| moment()}
+                                                        renderInput={(params)=><TextField style={{width: 'calc(100% - 20px)', background: 'white'}} {...params} />}
+                                                        onChange={()=>{}}
+                                                        disabled
+                                                    />
+                                                </LocalizationProvider>
                                             </Box>
                                         </Grid>
                                     ) : (

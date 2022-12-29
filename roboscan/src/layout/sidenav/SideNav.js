@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { Box, MenuList, MenuItem, Tooltip, tooltipClasses } from '@mui/material'
 import { BsCardText } from 'react-icons/bs'
-import { sections } from '../../data/dummyData'
+// import { sections } from '../../data/dummyData'
 import { styled } from '@mui/material/styles'
 import getIconByKey from '../../assets'
 import HoverImage from 'react-hover-image'
+import { useSectionData } from 'store/store'
 
 const CustomTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} arrow classes={{ popper: className }} />
@@ -21,24 +22,37 @@ const CustomTooltip = styled(({ className, ...props }) => (
     },
 }))
 
-const SideNav = () => {
-    const [selected, setSelected] = useState([])
+const SideNav = (props) => {
+
+    const {expanded, setExpanded} = props
+
+    const allSections = useSectionData(state=>state.sectionDetails)
 
     const handleSelect = (sec) => {
-        if (selected.filter((e) => e === sec.id).length === 0) {
-            setSelected([...selected, sec.id])
+        const sectionLocation = document.getElementById(`section-${sec.id}`)
+        console.log('Section', sectionLocation)
+        if (expanded.filter((e) => e === sec.id).length === 0) {
+            setExpanded([...expanded, sec.id])
+            if(sectionLocation !== null){
+                sectionLocation.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'})
+            }
             return
         }
-        if (selected.filter((e) => e === sec.id).length > 0) {
-            setSelected(selected.filter((e) => e !== sec.id))
+        if (expanded.filter((e) => e === sec.id).length > 0) {
+            setExpanded(expanded.filter((e) => e !== sec.id))
+            if(sectionLocation !== null){
+                sectionLocation.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'})
+            }
             return
         }
+
+        
     }
 
     return (
-        <Box className="overflow-hidden hover:overflow-auto h-[calc(100vh-78px)] bg-app-dark">
+        <Box className="overflow-hidden hover:overflow-auto h-[calc(100vh-78px)] bg-app-dark transition-all">
             <MenuList className="px-auto pb-10">
-                {sections.map((sec) => (
+                {allSections.map((sec) => (
                     <CustomTooltip
                         placement={'right'}
                         key={sec.id}
@@ -48,7 +62,7 @@ const SideNav = () => {
                             className={
                                 'flex justify-center items-center my-4 hover:bg-[#e0e0e0e0]  hover:text-app-dark rounded-full w-12 h-12 mx-auto hover:scale-110 transition-all p-3' +
                                 ' ' +
-                                (selected.filter((e) => e === sec.id).length > 0
+                                (expanded.filter((e) => e === sec.id).length > 0
                                     ? 'bg-[#e0e0e0] text-app-dark scale-110'
                                     : 'text-white')
                             }
@@ -58,7 +72,7 @@ const SideNav = () => {
 
                             {sec.icon ? (
                                 <>
-                                    {selected.filter((e) => e === sec.id)
+                                    {expanded.filter((e) => e === sec.id)
                                         .length > 0 ? (
                                         <img
                                             src={getIconByKey(
